@@ -10,7 +10,14 @@ import Debug.Trace
 import qualified Data.Set as S
 import qualified Data.Map.Strict as M
 
-solve = putStrLn $ renderLines $ tryFixPhonetics $ fillShapes solveShapes
+solve = putStrLn (renderLines lines ++ "\nAlliterations: " ++ show allits) where
+  lines = tryFixPhonetics $ fillShapes solveShapes
+  allits = length $ filter hasAlliteration lines
+
+hasAlliteration :: [String] -> Bool
+hasAlliteration allWords = any sameStart $ zip3 elemWords (drop 1 elemWords) (drop 2 elemWords) where
+  elemWords = filter elemWord allWords
+  sameStart ((c:_), w2, w3) = [c] `isPrefixOf` w2 && [c] `isPrefixOf` w3
 
 -----------------------
 
@@ -246,7 +253,9 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
 
 homogeneity words = if sameLetterPairs == length elemWords then 100 else sameLetterPairs where
   sameLetterPairs = length $ filter (\(w1, w2) -> head w1 == head w2) $ zip elemWords (drop 1 elemWords)
-  elemWords = filter (`M.member` elementsWithAccents) words
+  elemWords = filter elemWord words
+
+elemWord w = w `M.member` elementsWithAccents
   
 ------------
 
