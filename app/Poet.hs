@@ -13,11 +13,30 @@ import qualified Data.Map.Strict as M
 solve = putStrLn (renderLines lines ++ "\nAlliterations: " ++ show allits) where
   lines = tryFixPhonetics $ fillShapes solveShapes
   allits = length $ filter hasAlliteration lines
+  
+----------------------  
 
 hasAlliteration :: [String] -> Bool
 hasAlliteration allWords = any sameStart $ zip3 elemWords (drop 1 elemWords) (drop 2 elemWords) where
   elemWords = filter elemWord allWords
   sameStart ((c:_), w2, w3) = [c] `isPrefixOf` w2 && [c] `isPrefixOf` w3
+
+similarity = \w1 w2 -> similarities M.! (order w1 w2) where
+  order w1 w2 = (min w1 w2, max w1 w2)
+  similarities = M.fromList [((order w1 w2), calcSimilarity w1 w2) | w1 <- elements, w2 <- elements, w1 /= w2] where
+    lcs [] _ = 0
+    lcs _ [] = 0
+    lcs (x:xs) (y:ys) = if x == y then 1 + lcs xs ys else max (lcs (x:xs) ys) (lcs xs (y:ys))
+    toInt b = if b then 1 else 0
+    rhymeClassOf w = findIndex (w `elem`) postProcessedRhymes
+    calcSimilarity w1 w2 = foldl' (\a i -> a * 10 + i) 0 [
+     toInt $ head w1 == head w2,
+     toInt $ rhymeClassOf w1 == rhymeClassOf w2,
+     lcs w1 w2, 
+     toInt $ shape w1 == shape w2,
+     S.size $ S.intersection (S.fromList w1) (S.fromList w2)]
+
+closestElements = M.fromList [(e, reverse $ sortBy (comparing $ similarity e) $ delete e elements) | e <- elements]
 
 -----------------------
 
