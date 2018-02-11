@@ -265,12 +265,16 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
   rating line words = homogeneity (words ++ snd (template !! line))
 
   mapping :: M.Map Int [String]
-  mapping = fillLines (S.fromList remainingWords) M.empty where
-    fillLines availableWords result = answer where
-      options = map (\i -> (i, fillLine availableWords i)) $ filter (not . (`M.member` result)) lineIndices
+  mapping = fillLines remainingSet (map (\i -> (i, fillLine remainingSet i)) lineIndices) M.empty where
+    remainingSet = S.fromList remainingWords
+    fillLines availableWords options result = answer where
       (bestLine, bestWords) = maximumBy (comparing $ \(line, words) -> rating line words) $ reverse options
+      usedWords = S.fromList bestWords
+      nextAvailable = S.difference availableWords usedWords
+      nextOptions = map (\(i, words) -> (i, if any (`S.member` usedWords) words then fillLine nextAvailable i else words)) $ 
+        filter (\p -> fst p /= bestLine) options
       answer = if null options then result 
-               else fillLines (S.difference availableWords $ S.fromList bestWords) (M.insert bestLine bestWords result)
+               else fillLines nextAvailable nextOptions (M.insert bestLine bestWords result)
 
 homogeneity words = if sameLetterPairs == length elemWords then 100 else sameLetterPairs where
   sameLetterPairs = length $ filter (\(w1, w2) -> head w1 == head w2) $ zip elemWords (drop 1 elemWords)
