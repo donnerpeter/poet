@@ -29,7 +29,7 @@ similarity = \w1 w2 -> similarities M.! (order w1 w2) where
     lcs (x:xs) (y:ys) = if x == y then 1 + lcs xs ys else max (lcs (x:xs) ys) (lcs xs (y:ys))
     toInt b = if b then 1 else 0
     rhymeClassOf w = findIndex (w `elem`) postProcessedRhymes
-    calcSimilarity w1 w2 = foldl' (\a i -> a * 10 + i) 0 [
+    calcSimilarity w1 w2 = 1 + foldl' (\a i -> a * 10 + i) 0 [
      toInt $ head w1 == head w2,
      toInt $ rhymeClassOf w1 == rhymeClassOf w2,
      lcs w1 w2, 
@@ -173,7 +173,7 @@ allMarkupContinuations = cycle (map markupFrom [0..3]) where
     if isStrongAccentPosition (pos + wsTotal shape) then [[shape]]
     else [[shape], [shape, fillerShape]]    
 
-markLine start end = filter fillersSoundNice $ inner 0 start where
+markLine start end = filter (bounded maxVector . toVector) $ filter fillersSoundNice $ inner 0 start where
   fillersSoundNice middleShapes = elemIndex fillerShape (reverse middleShapes) /= Just 1
   inner wordCount pos =
     if pos > end || wordCount > 7 then []
@@ -221,10 +221,7 @@ solvePart :: [[ShapeVector]] -> ShapeVector -> Maybe [ShapeVector]
 solvePart lineVectors targetVector = getPath (length table - 1) targetVector [] where
   table = map addSumLine $ zip ([(0,0)]:table) lineVectors
   addSumLine :: (SumLine, [ShapeVector]) -> SumLine
-  addSumLine (prev, vs) = removeDuplicates fst $ filter (bounded . fst) [(fst prevSum + v, v) | prevSum <- prev, v <- vs]
-  bounded vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1]
-  vecByte :: ShapeVector -> Int -> Word64 
-  vecByte vec i = shift vec (-i * 8) .&. 255
+  addSumLine (prev, vs) = removeDuplicates fst $ filter (bounded targetVector . fst) [(fst prevSum + v, v) | prevSum <- prev, v <- vs]
   getPath index sum result =
     if index < 0 then Just result
     else case lookup sum (table !! index) of
@@ -235,6 +232,11 @@ template1 = take 12 templateVectors
 template2 = drop 12 templateVectors
 target1 = toVector $ take (length remainingShapes `div` 2) remainingShapes
 target2 = toVector $ drop (length remainingShapes `div` 2) remainingShapes
+maxVector = toVector remainingShapes
+
+bounded targetVector vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1] where
+  vecByte :: ShapeVector -> Int -> Word64 
+  vecByte vec i = shift vec (-i * 8) .&. 255
 
 solveShapes = zipWith markupByVector [0..] $ fromJust (solvePart template1 target1) ++ fromJust (solvePart template2 target2) where
   markupByVector :: Int -> ShapeVector -> [WordShape]
