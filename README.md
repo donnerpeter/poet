@@ -2,6 +2,7 @@ Translating Tom Lehrer's ["Elements" song](https://www.youtube.com/watch?v=DYW50
 
 Current best result (manually beautified a bit):
 
+```
 Есть кремний, кислород и углерод и водород и йод,
 а также галлий, гафний, гелий, гольмий, молибден, азот,
 вольфрам и кюрий, золото и марганец, мышьяк, лантан
@@ -34,3 +35,4 @@ Current best result (manually beautified a bit):
 
 Здесь те, что я нагуглил в этих ваших интернетах,
 простите, у меня для вас других пока что нету.
+```
