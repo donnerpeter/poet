@@ -1,6 +1,6 @@
 Translating Tom Lehrer's ["Elements" song](https://www.youtube.com/watch?v=DYW50F42ss8) into Russian.
 
-Current best result (manually beautified a bit):
+Current best result, [video](https://www.youtube.com/watch?v=V5pt436hFWs) and text (manually beautified a bit):
 
 ```
 Есть кремний, кислород и углерод и водород и йод,
