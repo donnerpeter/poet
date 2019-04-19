@@ -12,4 +12,4 @@ def tr(match):
         return s
 
 for line in sys.stdin:
-    sys.stdout.write(re.sub(r"\\([0-9]{4})", tr, line))
+    sys.stdout.write(re.sub(r"\\([0-9]{3,4})", tr, line))
