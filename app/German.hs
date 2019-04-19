@@ -1,26 +1,26 @@
 module German where
 
 import Data.List
+import Data.Char
 import qualified Data.Map as M
 
 syllableCount s = length (vowels s)
-isVowel p = p `isInfixOf` "AEIOUYauäeiöoy" || p == "Ei"
+isVowel p = p `isInfixOf` "AUÄEIÖOY"
 vowels s = filter isVowel (phonemes s)
 
 phonemes :: String -> [String]
-phonemes [] = []
- -- todo lowercase
-phonemes ('Q':'u':rest) = "kw" : phonemes rest
-phonemes ('a':'u':rest) = "au" : phonemes rest
-phonemes ('E':'i':rest) = "ei" : phonemes rest
-phonemes ('e':'i':rest) = "ei" : phonemes rest
-phonemes ('A':'s':'t':rest) = "A" : "s" : "t" : phonemes rest
-phonemes ('s':'t':rest) = "sch" : "t" : phonemes rest
-phonemes ('c':'h':rest) = "xx" : phonemes rest
-phonemes ('c':'k':rest) = "k" : phonemes rest
-phonemes ('c':v:rest) | v `elem` "aou" = "k" : phonemes (v:rest)
-phonemes ('z':rest) = "c" : phonemes rest
-phonemes (c:rest) = [c]:phonemes rest
+phonemes word = inner $ map toUpper word where 
+    inner [] = []
+    inner ('Q':'U':rest) = "KW" : inner rest
+    inner ('A':'U':rest) = "AU" : inner rest
+    inner ('E':'I':rest) = "EI" : inner rest
+    inner ('A':'S':'T':rest) = "A" : "S" : "T" : inner rest
+    inner ('S':'T':rest) = "SCH" : "T" : inner rest
+    inner ('C':'H':rest) = "XX" : inner rest
+    inner ('C':'K':rest) = "K" : inner rest
+    inner ('C':v:rest) | v `elem` "AOU" = "K" : inner (v:rest)
+    inner ('Z':rest) = "C" : inner rest
+    inner (c:rest) = [c]:inner rest
 
 conjunct = "und"
 
