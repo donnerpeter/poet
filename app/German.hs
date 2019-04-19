@@ -1,4 +1,4 @@
-module German where
+module German (elementsWithAccents, syllableCount, template, elements, postProcessedRhymes, conjunct) where
 
 import Data.List
 import Data.Char
@@ -102,4 +102,36 @@ postProcessedRhymes = [
 
     -- non-finishing
     ["Xenon","Neon"]
+    ]
+
+template = [
+    (["Es gibt"], ["Röntgenium"]),
+    (["und"], ["Rhenium"]),
+    ([], ["Lanthan"]),
+    (["und"], ["Titan"]),
+
+    ([], ["Vanadium"]),
+    (["und"], ["Radium"]),
+    ([], ["Gallium"]),
+    (["und"], ["Thallium"]),
+
+    (["Es gibt"], ["Rubidium"]),
+    (["und"], ["Iridium"]),
+    (["und"], ["Samarium"]),
+    (["und"], ["Barium"]),
+
+    (["Es gibt"], ["Erbium"]),
+    (["und"], ["Terbium"]),
+    (["und"], ["Thorium"]),
+    (["und"], ["Bohrium"]),
+
+    (["und"], ["Plutonium"]),
+    (["und"], ["Polonium"]),
+    (["und"], ["Neptunium"]),
+    (["und"], ["Dubnium"]),
+
+    (["Es gibt"], ["Berkelium"]),
+    (["und"], ["Nobelium"]),
+    ([], ["Francium"]),
+    ([], ["Calcium"])
     ]
