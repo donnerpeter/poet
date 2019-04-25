@@ -13,7 +13,9 @@ phonemes word = inner $ map toUpper word where
     inner [] = []
     inner ('Q':'U':rest) = "KW" : inner rest
     inner ('A':'U':rest) = "AU" : inner rest
-    inner ('E':'I':rest) = "EI" : inner rest
+    inner ('E':'I':rest) = "AI" : inner rest
+    inner ('E':'U':rest) = "OI" : inner rest
+    inner ('E':'A':rest) = "I" : inner rest -- Seaborgium
     inner ('A':'S':'T':rest) = "A" : "S" : "T" : inner rest
     inner ('S':'T':rest) = "SCH" : "T" : inner rest
     inner ('C':'H':rest) = "XX" : inner rest
@@ -105,8 +107,8 @@ postProcessedRhymes = [
     ]
 
 template = [
-    (["Es gibt"], ["Röntgenium"]),
-    (["und"], ["Rhenium"]),
+    (["Es gibt"], ["Rhenium"]),
+    (["und"], ["Kohlenstoff", "und", "Wasserstoff", "und", "Stickstoff", "und", "Röntgenium"]),
     ([], ["Lanthan"]),
     (["und"], ["Titan"]),
 
@@ -117,18 +119,18 @@ template = [
 
     (["Es gibt"], ["Rubidium"]),
     (["und"], ["Iridium"]),
-    (["und"], ["Samarium"]),
+    ([], ["Samarium"]),
     (["und"], ["Barium"]),
 
     (["Es gibt"], ["Erbium"]),
     (["und"], ["Terbium"]),
-    (["und"], ["Thorium"]),
+    ([], ["Thorium"]),
     (["und"], ["Bohrium"]),
 
     (["und"], ["Plutonium"]),
-    (["und"], ["Polonium"]),
+    ([], ["Polonium"]),
     (["und"], ["Neptunium"]),
-    (["und"], ["Dubnium"]),
+    ([], ["Dubnium"]),
 
     (["Es gibt"], ["Berkelium"]),
     (["und"], ["Nobelium"]),
