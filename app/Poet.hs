@@ -1,4 +1,4 @@
-{-#LANGUAGE TupleSections#-}
+{-#LANGUAGE TupleSections,BangPatterns#-}
 module Poet where
 
 import Data.Ord
@@ -129,8 +129,8 @@ target1 = toVector $ take (length remainingShapes `div` 2) remainingShapes
 target2 = toVector $ drop (length remainingShapes `div` 2) remainingShapes
 maxVector = toVector remainingShapes
 
-bounded targetVector vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1] where
-  vecByte :: ShapeVector -> Int -> Word64 
+bounded !targetVector !vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1] where
+  vecByte :: ShapeVector -> Int -> Word64
   vecByte vec i = shift vec (-i * 8) .&. 255
 
 solveShapes = zipWith markupByVector [0..] $ fromJust (solvePart template1 target1) ++ fromJust (solvePart template2 target2) where
