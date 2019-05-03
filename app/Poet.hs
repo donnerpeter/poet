@@ -93,15 +93,22 @@ isStrongAccentPosition pos = pos `mod` 4 == 1
 
 type ShapeVector = Word64
 
+placeBits = 6
 vectorLength = 8
+placeMax = shift 1 placeBits - 1
+
+shape2VectorPlace :: M.Map WordShape Int
+shape2VectorPlace =
+  if length allShapes > vectorLength then error $ "more shapes " ++ show (length allShapes) ++ " than fits"
+  else M.fromList $ zip allShapes [0..]
 
 toVector :: [WordShape] -> ShapeVector
 toVector shapes = listToVector $ map (\i -> M.findWithDefault 0 i index2Count) [0..vectorLength - 1] where
-  index2Count = M.fromListWith (+) $ map (\s -> (shapeIndex s, 1)) $ filter (/= fillerShape) shapes
-  shapeIndex :: WordShape -> Int
-  shapeIndex shape = (wsTotal shape) * (wsTotal shape - 1) `div` 2 + (wsTotal shape - wsAccent shape)
+  index2Count = M.fromListWith (+) $ map (\s -> (shape2VectorPlace M.! s, 1)) $ filter (/= fillerShape) shapes
   listToVector :: [Int] -> ShapeVector
-  listToVector list = sum $ zipWith (\val index -> shift (fromIntegral val) (index * 8)) list [0..vectorLength - 1]
+  listToVector list =
+    if not (and $ map (\i -> fromIntegral i <= placeMax) list) then error $ "placeMax < " ++ show list
+    else sum $ zipWith (\val index -> shift (fromIntegral val) (index * placeBits)) list [0..vectorLength - 1]
   
 templateVectors = map (\lineMarkups -> removeDuplicates id $ map toVector lineMarkups) templateMarkups
 
@@ -133,7 +140,7 @@ maxVector = toVector remainingShapes
 
 bounded !targetVector !vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1] where
   vecByte :: ShapeVector -> Int -> Word64
-  vecByte vec i = shift vec (-i * 8) .&. 255
+  vecByte vec i = shift vec (-i * placeBits) .&. placeMax
 
 solveShapes = zipWith markupByVector [0..] $ fromJust (solvePart template1 target1) ++ fromJust (solvePart template2 target2) where
   markupByVector :: Int -> ShapeVector -> [WordShape]
