@@ -1,0 +1,1 @@
+stack build && time .stack-work/dist/x86_64-linux/Cabal-2.4.0.1/build/poet-exe/poet-exe

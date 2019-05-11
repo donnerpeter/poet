@@ -16,7 +16,7 @@ cabal-version:       >=1.10
 executable poet-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  ghc-options:         -rtsopts -with-rtsopts=-N
+  ghc-options:         -rtsopts -with-rtsopts=-N -threaded -O2
   build-depends:       base
                      , containers
   default-language:    Haskell2010

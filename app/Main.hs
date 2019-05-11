@@ -3,5 +3,6 @@ module Main where
 import Poet
 
 main :: IO ()
-main = undefined
+main = do
+  putStrLn $ show solveShapes
 
