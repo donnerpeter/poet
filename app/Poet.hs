@@ -8,6 +8,7 @@ import Data.List
 import Data.Maybe
 import Debug.Trace
 import qualified Data.Set as S
+import qualified Data.IntSet as IS
 import qualified Data.Map.Strict as M
 import Russian
 
@@ -91,7 +92,7 @@ isStrongAccentPosition pos = pos `mod` 4 == 1
 
 ---------------------------
 
-type ShapeVector = Word64
+type ShapeVector = Int
 
 placeBits = 6
 vectorLength = 8
@@ -112,10 +113,10 @@ toVector shapes = listToVector $ map (\i -> M.findWithDefault 0 i index2Count) [
   
 templateVectors = map (\lineMarkups -> removeDuplicates id $ map toVector lineMarkups) templateMarkups
 
-removeDuplicates by xs = inner S.empty xs where
+removeDuplicates by xs = inner IS.empty xs where
   inner _ [] = []
   inner visited (x:xs) = let eq = by x in
-    if eq `S.member` visited then inner visited xs else x:(inner (S.insert eq visited) xs)
+    if eq `IS.member` visited then inner visited xs else x:(inner (IS.insert eq visited) xs)
 
 -------------
 
@@ -139,7 +140,6 @@ target2 = toVector $ drop (length remainingShapes `div` 2) remainingShapes
 maxVector = toVector remainingShapes
 
 bounded !targetVector !vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1] where
-  vecByte :: ShapeVector -> Int -> Word64
   vecByte vec i = shift vec (-i * placeBits) .&. placeMax
 
 solveShapes = zipWith markupByVector [0..] $ fromJust (solvePart template1 target1) ++ fromJust (solvePart template2 target2) where
