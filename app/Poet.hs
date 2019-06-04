@@ -56,7 +56,12 @@ remainingShapes = map shape remainingWords
 
 data WordShape = WordShape { wsTotal :: Int, wsAccent :: Int } deriving (Show, Eq, Ord)
 
-shape word = WordShape (syllableCount word) (M.findWithDefault (-1) word elementsWithAccents)
+shape word = result where
+ sc = syllableCount word
+ accent = M.findWithDefault (-1) word elementsWithAccents
+ result =
+   if sc <= 0 || accent < 0 || accent > sc then error $ "Incorrect syllables/accent in " ++ word
+   else WordShape sc accent
 fillerShape = WordShape 1 0
 
 allShapes = S.elems $ S.fromList $ map shape elements
@@ -106,10 +111,11 @@ shape2VectorPlace =
 toVector :: [WordShape] -> ShapeVector
 toVector shapes = listToVector $ map (\i -> M.findWithDefault 0 i index2Count) [0..vectorLength - 1] where
   index2Count = M.fromListWith (+) $ map (\s -> (shape2VectorPlace M.! s, 1)) $ filter (/= fillerShape) shapes
-  listToVector :: [Int] -> ShapeVector
-  listToVector list =
-    if not (and $ map (\i -> fromIntegral i <= placeMax) list) then error $ "placeMax < " ++ show list
-    else sum $ zipWith (\val index -> shift (fromIntegral val) (index * placeBits)) list [0..vectorLength - 1]
+
+listToVector :: [Int] -> ShapeVector
+listToVector list =
+  if not (and $ map (\i -> fromIntegral i <= placeMax) list) then error $ "placeMax < " ++ show list
+  else sum $ zipWith (\val index -> shift (fromIntegral val) (index * placeBits)) list [0..vectorLength - 1]
   
 templateVectors = map (\lineMarkups -> removeDuplicates id $ map toVector lineMarkups) templateMarkups
 
@@ -126,21 +132,35 @@ solvePart :: [[ShapeVector]] -> ShapeVector -> Maybe [ShapeVector]
 solvePart lineVectors targetVector = getPath (length table - 1) targetVector [] where
   table = map addSumLine $ zip ([(0,0)]:table) lineVectors
   addSumLine :: (SumLine, [ShapeVector]) -> SumLine
-  addSumLine (prev, vs) = removeDuplicates fst $ filter (bounded targetVector . fst) [(fst prevSum + v, v) | prevSum <- prev, v <- vs]
-  getPath index sum result =
+  addSumLine (prev, vs) = traceShow ("sumLine", length prev) $ removeDuplicates fst $ filter (bounded targetVector . fst) [(fst prevSum + v, v) | prevSum <- prev, v <- vs]
+  lastRowBytes = map (vecBytes . fst) $ last table
+  getPath index targetSum result =
     if index < 0 then Just result
-    else case lookup sum (table !! index) of
-      Just vec -> getPath (index - 1) (sum - vec) (vec : result)
-      Nothing -> Nothing 
+    else case lookup targetSum (table !! index) of
+      Just vec -> getPath (index - 1) (targetSum - vec) (vec : result)
+      Nothing -> error $
+        "cannot find " ++ show (vecBytes targetSum) ++
+        " (" ++ (show $ sum $ vecBytes targetSum) ++ " words) " ++
+        "in line " ++ show index ++
+        ", max in each dimension = " ++ show (foldl1' (zipWith max) lastRowBytes) ++
+        ", closest = " ++ show (take 10 $ sortBy (comparing $ distance $ vecBytes targetVector) lastRowBytes) ++
+        ", max word count = " ++ show (maximum $ map sum lastRowBytes)
 
 template1 = take 12 templateVectors
 template2 = drop 12 templateVectors
 target1 = toVector $ take (length remainingShapes `div` 2) remainingShapes
-target2 = toVector $ drop (length remainingShapes `div` 2) remainingShapes
+target2 = maxVector - target1
 maxVector = toVector remainingShapes
 
-bounded !targetVector !vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1] where
-  vecByte vec i = shift vec (-i * placeBits) .&. placeMax
+bounded !targetVector !vec = all (\i -> vecByte vec i <= vecByte targetVector i) [0..vectorLength - 1]
+
+vecByte !vec !i = shift vec (-i * placeBits) .&. placeMax
+vecBytes vec = map (vecByte vec) [0..vectorLength - 1]
+
+vecMax xs ys = zipWith max xs ys
+
+distance :: [Int] -> [Int] -> Int
+distance xs ys = sum $ zipWith (\x y -> abs (x - y)) xs ys
 
 solveShapes = zipWith markupByVector [0..] $ fromJust (solvePart template1 target1) ++ fromJust (solvePart template2 target2) where
   markupByVector :: Int -> ShapeVector -> [WordShape]
