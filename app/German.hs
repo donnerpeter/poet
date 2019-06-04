@@ -1,11 +1,11 @@
-module German (elementsWithAccents, syllableCount, template, elements, postProcessedRhymes, conjunct) where
+module German (elementsWithAccents, syllableCount, template, elements, postProcessedRhymes, conjunct, phonemes) where
 
 import Data.List
 import Data.Char
 import qualified Data.Map as M
 
 syllableCount s = length (vowels s)
-isVowel p = p `isInfixOf` "AUÄEIÖOY"
+isVowel p = p `isInfixOf` "AÄEIÖOUY" || p == "AU" || p == "AI" || p == "OI"
 vowels s = filter isVowel (phonemes s)
 
 phonemes :: String -> [String]
@@ -44,7 +44,7 @@ elementsWithAccents :: M.Map String Int
 elementsWithAccents = M.fromList [
     ("Actinium", 2), ("Aluminium", 3), ("Americium", 3), ("Antimon", 3), ("Argon", 2), -- 1?
     ("Arsen", 2), ("Astat", 2),
-    ("Barium", 1), ("Berkelium", 2), ("Beryllium", 1), ("Bismut", 1), ("Blei", 1), ("Bohrium", 1), ("Bor", 1), ("Brom", 1),
+    ("Barium", 1), ("Berkelium", 2), ("Beryllium", 2), ("Bismut", 1), ("Blei", 1), ("Bohrium", 1), ("Bor", 1), ("Brom", 1),
     ("Cadmium", 1), ("Cäsium", 1), ("Calcium", 1), ("Californium", 3), ("Cer", 1), ("Chlor", 1), ("Chrom", 1), ("Cobalt", 1), ("Copernicium", 3), ("Curium", 1),
     ("Darmstadtium", 2), ("Dubnium", 1), ("Dysprosium", 1),
     ("Einsteinium", 2), ("Eisen", 1), ("Erbium", 1), ("Europium", 3),
@@ -131,6 +131,11 @@ template = [
     ([], ["Polonium"]),
     (["und"], ["Neptunium"]),
     ([], ["Dubnium"]),
+
+    (["Es gibt"], ["Protactinium"]),
+    ([], ["Gadolinium"]),
+    ([], ["Aluminium"]),
+    ([], ["Actinium"]),
 
     (["Es gibt"], ["Berkelium"]),
     (["und"], ["Nobelium"]),
