@@ -182,7 +182,7 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
   lineIndices = [0 .. length shapeLines - 1] 
 
   fillLine :: S.Set String -> Int -> [String]
-  fillLine _availableWords line = maximumBy (comparing $ rating line) $ reverse allOptions where
+  fillLine _availableWords line = if null shapes then [] else maximumBy (comparing $ rating line) $ reverse allOptions where
     allOptions = map tryLetter allLetters
     allLetters = S.elems $ S.map head $ S.filter (\w -> shape w `elem` shapes) _availableWords
     shapes = shapeLines !! line
