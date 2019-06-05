@@ -27,7 +27,7 @@ solvedShapes = [[WordShape {wsTotal = 2, wsAccent = 2},WordShape {wsTotal = 2, w
 hasAlliteration :: [String] -> Bool
 hasAlliteration allWords = any sameStart $ zip3 elemWords (drop 1 elemWords) (drop 2 elemWords) where
   elemWords = filter elemWord allWords
-  sameStart ((c:_), w2, w3) = [c] `isPrefixOf` w2 && [c] `isPrefixOf` w3
+  sameStart ((c:_), w2, w3) = [c] `isPrefixOf` (concat $ phonemes w2) && [c] `isPrefixOf` (concat $ phonemes w3)
 
 alliterationCount :: [[String]] -> Int
 alliterationCount lines = length $ filter hasAlliteration lines
@@ -186,7 +186,7 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
     allOptions = map tryLetter allLetters
     allLetters = S.elems $ S.map head $ S.filter (\w -> shape w `elem` shapes) _availableWords
     shapes = shapeLines !! line
-    bestMatching c words = fromMaybe (head words) $ find ([c] `isPrefixOf`) words
+    bestMatching c words = fromMaybe (head words) $ find (\w -> [c] `isPrefixOf` (concat $ phonemes w)) words
     foreachFold list var body = foldl' body var list
     tryLetter c = snd $ foreachFold shapes (_availableWords, []) $ \(availableWords, result) eachShape ->
       let word = if eachShape == fillerShape then conjunct else bestMatching c $ filter (\w -> shape w == eachShape) $ S.elems availableWords
@@ -226,7 +226,7 @@ findPhoneticIssues lines = concat $ zipWith3 (\prev (word, loc) next -> if hasIs
   words = concat lines
   hasIssue prev word next = (issueBetween prev word || issueBetween word next) && word `elem` remainingWords where
     issueBetween w1 w2 = sameLetter w1 w2 || w2 == "ртуть" && ("ть" `isSuffixOf` w1 || "т" `isSuffixOf` w1) 
-    sameLetter w1 w2 = not (null w1) && [last w1] `isPrefixOf` w2
+    sameLetter w1 w2 = not (null w1) && [last w1] `isPrefixOf` (concat $ phonemes w2)
 
 tryFixPhonetics :: [[String]] -> [[String]]
 tryFixPhonetics lines = case findPhoneticIssues lines of

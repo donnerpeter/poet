@@ -18,9 +18,13 @@ phonemes word = inner $ map toUpper word where
     inner ('E':'A':rest) = "I" : inner rest -- Seaborgium
     inner ('A':'S':'T':rest) = "A" : "S" : "T" : inner rest
     inner ('S':'T':rest) = "SCH" : "T" : inner rest
+    inner ('S':'C':'H':rest) = "SCH" : inner rest
+    inner ('P':'H':rest) = "F" : inner rest
+    inner ('X':rest) = "K" : "S" : inner rest
     inner ('C':'H':rest) = "XX" : inner rest
     inner ('C':'K':rest) = "K" : inner rest
     inner ('C':v:rest) | v `elem` "AOU" = "K" : inner (v:rest)
+    inner ('S':v:rest) | v `elem` "AOUE" = "Z" : inner (v:rest)
     inner ('Z':rest) = "C" : inner rest
     inner (c:rest) = [c]:inner rest
 
