@@ -12,7 +12,7 @@ import qualified Data.IntSet as IS
 import qualified Data.Map.Strict as M
 import German
 
-solve = putStrLn (renderLines lines ++ "\nAlliterations: " ++ show (alliterationCount lines)) where
+solve = putStrLn (renderLines lines ++ "\n\nAlliterations: " ++ show (alliterationCount lines)) where
   lines = tryFixPhonetics $ fillShapes solvedShapes
 
 --solvedShapes = solveShapes
@@ -25,9 +25,9 @@ solvedShapes = [[WordShape {wsTotal = 2, wsAccent = 2},WordShape {wsTotal = 2, w
 ----------------------
 
 hasAlliteration :: [String] -> Bool
-hasAlliteration allWords = any sameStart $ zip3 elemWords (drop 1 elemWords) (drop 2 elemWords) where
-  elemWords = filter elemWord allWords
-  sameStart ((c:_), w2, w3) = [c] `isPrefixOf` (concat $ phonemes w2) && [c] `isPrefixOf` (concat $ phonemes w3)
+hasAlliteration allWords = any sameStart $ zip3 elemPhonemes (drop 1 elemPhonemes) (drop 2 elemPhonemes) where
+  elemPhonemes = map (concat . phonemes) $ filter elemWord allWords
+  sameStart ((c:_), w2, w3) = [c] `isPrefixOf` w2 && [c] `isPrefixOf` w3
 
 alliterationCount :: [[String]] -> Int
 alliterationCount lines = length $ filter hasAlliteration lines
@@ -184,7 +184,7 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
   fillLine :: S.Set String -> Int -> [String]
   fillLine _availableWords line = if null shapes then [] else maximumBy (comparing $ rating line) $ reverse allOptions where
     allOptions = map tryLetter allLetters
-    allLetters = S.elems $ S.map head $ S.filter (\w -> shape w `elem` shapes) _availableWords
+    allLetters = S.elems $ S.map (\w -> head $ concat $ phonemes w) $ S.filter (\w -> shape w `elem` shapes) _availableWords
     shapes = shapeLines !! line
     bestMatching c words = fromMaybe (head words) $ find (\w -> [c] `isPrefixOf` (concat $ phonemes w)) words
     foreachFold list var body = foldl' body var list
@@ -192,22 +192,23 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
       let word = if eachShape == fillerShape then conjunct else bestMatching c $ filter (\w -> shape w == eachShape) $ S.elems availableWords
       in (S.delete word availableWords, result ++ [word])
 
-  rating line words = homogeneity (words ++ snd (template !! line))
+  rating line words = (hasAlliteration elemWords, homogeneity elemWords, - length elemWords) where
+    elemWords = filter elemWord (words ++ snd (template !! line))
 
   mapping :: M.Map Int [String]
   mapping = fillLines remainingSet (map (\i -> (i, fillLine remainingSet i)) lineIndices) M.empty where
     remainingSet = S.fromList remainingWords
     fillLines availableWords options result = answer where
       (bestLine, bestWords) = maximumBy (comparing $ \(line, words) -> rating line words) $ reverse options
-      usedWords = S.fromList bestWords
+      usedWords = traceShow ("filled line", bestLine, bestWords, rating bestLine bestWords) $ S.fromList bestWords
       nextAvailable = S.difference availableWords usedWords
       nextOptions = map (\(i, words) -> (i, if any (`S.member` usedWords) words then fillLine nextAvailable i else words)) $ 
         filter (\p -> fst p /= bestLine) options
       answer = if null options then result 
                else fillLines nextAvailable nextOptions (M.insert bestLine bestWords result)
 
-homogeneity words = if sameLetterPairs == length elemWords then 100 else sameLetterPairs where
-  sameLetterPairs = length $ filter (\(w1, w2) -> head w1 == head w2) $ zip elemWords (drop 1 elemWords)
+homogeneity words = if samePhonemePairs == length elemWords - 1 then 100 else samePhonemePairs where
+  samePhonemePairs = length $ filter (\(w1, w2) -> head (phonemes w1) == head (phonemes w2)) $ zip elemWords (drop 1 elemWords)
   elemWords = filter elemWord words
 
 elemWord w = w `M.member` elementsWithAccents
@@ -253,13 +254,13 @@ renderLines lines = concat $ zipWith3 (\p w s -> p ++ w ++ s) prefixes flatWords
   flatWords = concat lines
   prefixes = concat $ zipWith (\words line -> zipWith (\_ col -> if (line, col) `S.member` issues then "!!!" else "") words [0..]) lines [0..] where
     issues = S.fromList $ findPhoneticIssues lines
-  lineFeeds = concatMap (\line -> replicate (length line - 1) "" ++ ["\n"]) lines
+  lineFeeds = concatMap (\(line, index) -> replicate (length line - 1) "" ++ [if index `mod` 4 == 3 then "\n\n" else "\n"]) $ zip lines [0..]
   commas = zipWith (\feed tail -> if shouldPutComma feed tail then "," else "") lineFeeds $ tails flatWords
   shouldPutComma feed suffix = case suffix of
     w1:w2:_ | M.member w1 elementsWithAccents && M.member w2 elementsWithAccents -> True
     w1:c:_ | c == conjunct -> False
     c:_ | c == conjunct -> False
     ".":_ -> False
-    _ -> feed == "\n"
-  suffixes = zipWith3 (\feed comma nextWord -> comma ++ (if nextWord == "." || nextWord == "," || feed == "\n" then feed else " ")) lineFeeds commas (drop 1 flatWords)
+    _ -> not (null feed)
+  suffixes = zipWith3 (\feed comma nextWord -> comma ++ (if nextWord == "." || nextWord == "," || not (null feed) then feed else " ")) lineFeeds commas (drop 1 flatWords)
 
