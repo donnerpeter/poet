@@ -192,7 +192,7 @@ fillShapes shapeLines = zipWith (\middle (prefix, suffix) -> prefix ++ middle ++
       let word = if eachShape == fillerShape then conjunct else bestMatching c $ filter (\w -> shape w == eachShape) $ S.elems availableWords
       in (S.delete word availableWords, result ++ [word])
 
-  rating line words = (hasAlliteration elemWords, homogeneity elemWords, - length elemWords) where
+  rating line words = (- length (findPhoneticIssues [words]), hasAlliteration elemWords, homogeneity elemWords, - length elemWords) where
     elemWords = filter elemWord (words ++ snd (template !! line))
 
   mapping :: M.Map Int [String]
@@ -226,24 +226,21 @@ findPhoneticIssues lines = concat $ zipWith3 (\prev (word, loc) next -> if hasIs
                                      ([""] ++ words) (wordsWithLocations lines) (drop 1 words ++ [""]) where
   words = concat lines
   hasIssue prev word next = (issueBetween prev word || issueBetween word next) && word `elem` remainingWords where
-    issueBetween w1 w2 = sameLetter w1 w2 || w2 == "ртуть" && ("ть" `isSuffixOf` w1 || "т" `isSuffixOf` w1) 
-    sameLetter w1 w2 = not (null w1) && [last w1] `isPrefixOf` (concat $ phonemes w2)
+    issueBetween w1 w2 = sameLetter w1 w2 || w2 == "ртуть" && ("ть" `isPrefixOf` w1 || "т" `isPrefixOf` w1) || "d" `isSuffixOf` w1 && "T" `isPrefixOf` w2
+    sameLetter w1 w2 = not (null w1) && [last (concat $ phonemes w1)] `isPrefixOf` (concat $ phonemes w2)
 
 tryFixPhonetics :: [[String]] -> [[String]]
-tryFixPhonetics lines = case findPhoneticIssues lines of
-  [] -> lines
-  some:_ -> case fixPhoneticIssue lines some of
-    Nothing -> lines
-    Just better -> tryFixPhonetics better
+tryFixPhonetics lines = foldl' (\l issue -> fromMaybe l $ fixPhoneticIssue l issue) lines $ findPhoneticIssues lines
 
 fixPhoneticIssue :: [[String]] -> Location -> Maybe [[String]]
 fixPhoneticIssue lines loc = find isBetter $ sortBy (comparing priority) allSwaps where
-  isBetter ls = length (findPhoneticIssues ls) < issueCount where
+  isBetter ls = length (findPhoneticIssues ls) < issueCount && alliterationCount ls >= allits where
     issueCount = length (findPhoneticIssues lines)
+    allits = alliterationCount lines
   priority candidateLines = (-(alliterationCount lines), -(homogeneity $ concat candidateLines))
   allSwaps = map swapWords $ reverse alternativeLocations
   word = lines !! fst loc !! snd loc
-  alternativeLocations = filter (\(w, _) -> shape w == shape word && w /= word && not (S.member w templateWords)) $ wordsWithLocations lines
+  alternativeLocations = filter (\(w, _) -> w /= word && not (S.member w templateWords) && shape w == shape word) $ wordsWithLocations lines
   swapWords (anotherWord, loc2) = putWord loc anotherWord $ putWord loc2 word lines where 
     putWord (line, col) w lines = replace line (replace col w $ lines !! line) lines 
     replace index val list = take index list ++ (val : drop (index + 1) list)
