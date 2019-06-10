@@ -1,39 +1,39 @@
 ```
 Es gibt Radon, Selen und Zinn, Ruthenium und Rhenium
 und Kohlenstoff und Wasserstoff und Stickstoff und Röntgenium,
-Magnesium, Meitnerium, Moscovium, Mangan, Lanthan
-und Blei und Bor und Natrium und Neon, Neodym, Titan,
+Meitnerium, Lawrencium, Technetium, Uran, Lanthan
+und Chlor und Chrom und Holmium und Bismut, Molybdän, Titan,
 
-Flerovium und Fermium und Fluor und Vanadium
+Nihonium und Natrium und Neon und Vanadium
 und Brom und Rutherfordium und Rhodium und Radium,
 Germanium und Gold und Californium und Gallium
-und Tantal und Technetium und Thulium und Thallium,
+und Eisen und Einsteinium und Kalium und Thallium,
 
-Es gibt Tellur und Indium und Phosphor und Rubidium
-und Eisen und Einsteinium und Bismut und Iridium,
+Es gibt Mangan und Strontium und Schwefel und Rubidium
+und Phosphor und Magnesium und Nickel und Iridium,
 Silicium und Sauerstoff und Silber und Samarium
-und Nickel und Lawrencium und Lithium und Barium,
+und Tantal und Moscovium und Lithium und Barium,
 
 Es gibt Oganesson und Mendelevium und Erbium
 und Hafnium und Hassium und Helium und Terbium,
-Arsen und Antimon und Americium und Thorium
+Astat und Antimon und Americium und Thorium
 und Jod und Copernicium, Beryllium und Bohrium
 
-und Zink und Livermorium, Lutetium, Plutonium,
+und Platin und Palladium, Promethium, Plutonium,
 Darmstadtium, Dysprosium, Europium, Polonium
-und Platin und Palladium, Promethium, Neptunium,
-Seaborgium und Scandium und Holmium und Dubnium,
+und Zink und Livermorium, Lutetium, Neptunium,
+Seaborgium und Scandium und Indium und Dubnium,
 
-Es gibt Praseodym und Molybdän und Protactinium,
+Es gibt Praseodym und Neodym und Protactinium,
 Ytterbium und Yttrium, Niob und Gadolinium,
 Zirconium und Cäsium und Cer und Aluminium,
-Nihonium und Quecksilber und Tenness und Actinium,
+Flerovium und Osmium und Wolfram und Actinium,
 
-Es gibt Uran und Osmium und Wolfram und Berkelium
-und Curium und Kalium und Xenon und Nobelium,
-Astat und Chlor und Chrom und Schwefel, Strontium und Francium,
+Es gibt Tellur und Thulium und Tenness und Berkelium
+und Curium und Quecksilber und Xenon und Nobelium,
+Arsen und Blei und Bor und Fluor, Fermium und Francium,
 Argon und Cobalt, Krypton, Kupfer, Cadmium und Calcium
 
-Das sind die hundertachtzehn mir bekannte Elemente
+Das sind die hundertachtzehn jetzt bekannte Elemente
 Es gibt vielleicht noch mehr, das aber sind die unentdeckte
 ```
