@@ -34,6 +34,11 @@ und Curium und Quecksilber und Xenon und Nobelium,
 Arsen und Blei und Bor und Fluor, Fermium und Francium,
 Argon und Cobalt, Krypton, Kupfer, Cadmium und Calcium
 
+-----------
+
 Das sind die hundertachtzehn jetzt bekannte Elemente
 Es gibt vielleicht noch mehr, das aber sind die unentdeckte
+
+So etwas lernt man heute in den Universitäten:
+das war'n die hundertachtzehn jetzt bekannte Elemente 
 ```
